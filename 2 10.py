@@ -13,7 +13,11 @@ for i in range(len(a)):
     elif a[i] < 0:
         product_negative *= a[i]
     b[i] = a[len(a)-1-i]
+for i in range(len[a]): #revers an array in a different way
+    a[i], a[len(a) - 1 - i] = a[len(a) - 1 - i], a[i]
+
 
 print(b) #revers array
 print(product_negative)
 print(summ_pos)
+

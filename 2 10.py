@@ -16,7 +16,7 @@ for i in range(len(a)):
 for i in range(len[a]): #revers an array in a different way
     a[i], a[len(a) - 1 - i] = a[len(a) - 1 - i], a[i]
 
-
+print(a)
 print(b) #revers array
 print(product_negative)
 print(summ_pos)

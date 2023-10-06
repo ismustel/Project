@@ -13,7 +13,7 @@ for i in range(len(a)):
     elif a[i] < 0:
         product_negative *= a[i]
     b[i] = a[len(a)-1-i]
-for i in range(len(a//2)): #revers an array in a different way
+for i in range(len(a)//2): #revers an array in a different way
     a[i], a[len(a) - 1 - i] = a[len(a) - 1 - i], a[i]
 
 print(a)

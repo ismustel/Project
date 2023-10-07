@@ -9,9 +9,6 @@ for i in range(m):
         b.append(randint(0, 20))
     a.append(b)
 
-for lines in a:
-    print(lines)
-
 summ_zero_lines = 0
 
 for k in a:

@@ -1,5 +1,11 @@
+from random import randint
 
-a = [-7, 5, 4, -3, -1.2, 5, 10]
+n = randint(0, 20)
+a = []*n
+for i in range(n):
+    a.append(randint(0, 20))
+print(a)
+
 product_negative = 1
 summ_pos = 0
 max = a[0]
@@ -13,11 +19,10 @@ for i in range(len(a)):
     elif a[i] < 0:
         product_negative *= a[i]
     b[i] = a[len(a)-1-i]
-for i in range(len(a)//2): #revers an array in a different way
-    a[i], a[len(a) - 1 - i] = a[len(a) - 1 - i], a[i]
+for i in range(len(a)//2):
+    a[i], a[len(a) - 1 - i] = a[len(a) - 1 - i], a[i] #alternate version of the reverse array
 
 print(a)
 print(b) #revers array
 print(product_negative)
 print(summ_pos)
-

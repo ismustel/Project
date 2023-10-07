@@ -9,7 +9,7 @@ for i in range(m):
         b.append(randint(0, 20))
     a.append(b)
 
-summ_zero_lines = 0
+adsadasdlines = 0
 
 for k in a:
     for t in range(len(k)):

@@ -9,10 +9,10 @@ for i in range(m):
         b.append(randint(0, 20))
     a.append(b)
 
-adsadasdlines = 0
+summ_zero_lines = 0
 
 for k in a:
     for t in range(len(k)):
         if k[t] == 0:
             summ_zero_lines += 1
-print('number of lines with zero', summ_zero_lines)
+print('Number of lines with zero', summ_zero_lines)

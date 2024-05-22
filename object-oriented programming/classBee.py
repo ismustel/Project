@@ -1,6 +1,8 @@
 import random
-import tkinter
-
+from tkinter import *
+from tkinter import ttk
+import io
+import sys
 
 
 class Bee:  # Super class bee
@@ -52,7 +54,7 @@ class WorkBee(Bee):
 
     def check_activity(self):
         bee_activity = random.randint(0, 100)
-        if bee_activity > 20:
+        if bee_activity > 35:
             return True
         else:
             return False
@@ -82,12 +84,12 @@ class Larva:
     def __init__(self, number):
         # через 9 дней вырастает
         self.number = number
-        self.day_age = 0
+        self.day_age = 1
 
     def eat_honey(self):
         eating = random.randint(0, 100)
-        if eating > 5:
-            return 0.5
+        if eating > 10:
+            return 0.2
         else:
             return False
 
@@ -104,14 +106,13 @@ class Larva:
 class Egg:
     def __init__(self, number):
         self.number = number
-        self.day_egg_life = 0 # после 2 дней жизни умерает
+        self.day_egg_life = 0  # после 2 дней жизни умерает
 
     def day_life(self):
-        self.day_egg_life +=1
+        self.day_egg_life += 1
 
     def __str__(self):
         return 'Яйцо номер: {}'.format(self.number)
-
 
 
 class Hive:
@@ -125,6 +126,20 @@ class Hive:
         self.die_bee = 0
         self.number_larva = 0
         self.number_bee = 0
+        self.arr_activity_cleaning_bee = []  # пчёлы занимающиеся уборкой мёда
+        self.arr_activity_collect_bee = []  # пчёлы занимаающиеся сбором мёда
+        self.collect_honey_bee_day = 0
+        self.eaten_honey_day = 0
+        self.quantity_work_bee = 0
+        self.quantity_unwork_bee = 0
+        self.count_bees_die_hunger = 0
+        self.count_bees_die_age = 0
+        self.count_unworkbee_die_age = 0
+        self.count_unworkbee_die_hunger = 0
+        self.count_larva_die_age = 0  # кол-во личинок умирающих от возраста
+        self.count_lar_die_hunger = 0  # кол-во личинок умирающих от голода
+        self.diff_btw_honey = 0
+        self.quantity_die_larva = 0
 
     def count_die_bees(self):
         die_bee = 0
@@ -141,57 +156,59 @@ class Hive:
         return self.number_bee
 
     def life(self):
-        arr_activity_cleaning_bee = []  # пчёлы занимающиеся уборкой мёда
-        arr_activity_collect_bee = []  # пчёлы занимаающиеся сбором мёда
+        self.arr_activity_cleaning_bee = []  # пчёлы занимающиеся уборкой мёда
+        self.arr_activity_collect_bee = []
 
-        collect_honey_bee_day = 0  # кол-во меда съеденого за день
-        eaten_honey_day = 0  # кол-во меда съеденого за день
-        quantity_work_bee = 0  # кол-во рабочих пчел
-        quantity_unwork_bee = 0  # кол-во трутней
-        count_bees_die_hunger = 0  # кол-во пчёл умирающих от голода
-        count_bees_die_age = 0  # кол-во пчёл умирающих от старости
-        count_unworkbee_die_age = 0  # кол-во туртней умирающих от возраста
-        count_unworkbee_die_hunger = 0  # кол-во трутней умирающих от голода
+        self.collect_honey_bee_day = 0  # кол-во меда съеденого за день
+        self.eaten_honey_day = 0  # кол-во меда съеденого за день
+        self.quantity_work_bee = 0  # кол-во рабочих пчел
+        self.quantity_unwork_bee = 0  # кол-во трутней
+        self.count_bees_die_hunger = 0  # кол-во пчёл умирающих от голода
+        self.count_bees_die_age = 0  # кол-во пчёл умирающих от старости
+        self.count_unworkbee_die_age = 0  # кол-во туртней умирающих от возраста
+        self.count_unworkbee_die_hunger = 0  # кол-во трутней умирающих от голода
 
         self.day += 1
-        print('Day: {}'.format(self.day))
-
+        print()
+        print('============День {}============'.format(self.day))
+        print()
         for bee in self.bee:
             # condition for honey
             if bee.check_life():
                 if type(bee) == MotherBee:
                     self.egg += [Egg(i) for i in range(bee.sowing())]
                 if type(bee) == WorkBee:
-                    quantity_work_bee += 1
+                    self.quantity_work_bee += 1
                     if bee.consume_honey() and bee.get_cause_death() == 0:
                         self.honey_hive -= bee.consume_honey()
-                        eaten_honey_day += bee.consume_honey()
+                        self.eaten_honey_day += bee.consume_honey()
                         if bee.check_activity():
-                            arr_activity_collect_bee.append(bee)
+                            self.arr_activity_collect_bee.append(bee)
                             self.honey_hive += bee.collect_honey()
-                            collect_honey_bee_day +=bee.collect_honey()
-                            print('Рабочая пчела номер {} занимается сбором меда'.format(bee.get_number()))
+                            self.collect_honey_bee_day += bee.collect_honey()
+                            # print('Рабочая пчела номер {} занимается сбором меда'.format(bee.get_number()))
                         else:
-                            arr_activity_cleaning_bee.append(bee)
-                            print('Рабочая пчела номер {} занимается уборкой пчел'.format(bee.get_number()))
+                            self.arr_activity_cleaning_bee.append(bee)
+                            # print('Рабочая пчела номер {} занимается уборкой пчел'.format(bee.get_number()))
                     else:
-                        print('Рабочая пчела номер {} умерла от голода'.format(bee.get_number()))
-                        count_bees_die_hunger += 1
-                else:
-                    quantity_unwork_bee += 1
+                        # print('Рабочая пчела номер {} умерла от голода'.format(bee.get_number()))
+                        self.count_bees_die_hunger += 1
+
                 if type(bee) == UnworkBee:
-                    if bee.get_cause_death() == 0:
-                        print('Трутень номер {} жив'.format(bee.get_number()))
-                    if bee.get_cause_death() == 2:
-                        print('Трутень номер {} умер от голода'.format(bee.get_number()))
-                        count_unworkbee_die_hunger += 1
+                    self.quantity_unwork_bee += 1
+                    if bee.consume_honey() and bee.get_cause_death() == 0:
+                        # print('Трутень номер {} жив'.format(bee.get_number()))
+                        self.honey_hive -= bee.consume_honey()
+                    else:
+                        # print('Трутень номер {} умер от голода'.format(bee.get_number()))
+                        self.count_unworkbee_die_hunger += 1
             else:
                 if type(bee) == WorkBee:
-                    print('Рабочая пчела номер {} состарилась'.format(bee.get_number()))
-                    count_bees_die_age += 1
+                    # print('Рабочая пчела номер {} состарилась'.format(bee.get_number()))
+                    self.count_bees_die_age += 1
                 elif type(bee) == UnworkBee:
-                    print('Трутень номер {} состарилась'.format(bee.get_number()))
-                    count_unworkbee_die_age += 1
+                    # print('Трутень номер {} состарилась'.format(bee.get_number()))
+                    self.count_unworkbee_die_age += 1
 
             bee.grow_up()  # bee growth
 
@@ -204,14 +221,15 @@ class Hive:
                     self.egg.remove(self.egg[0])
                     self.larva.append(Larva(self.number_larva))
 
-        count_lar_die_hunger = 0  # кол-во личинок умирающих от голода
+        self.count_lar_die_hunger = 0  # кол-во личинок умирающих от голода
 
         for i, lar in enumerate(self.larva[:]):
-            if type(lar.eat_honey()):
+            if lar.eat_honey():
                 self.honey_hive -= lar.eat_honey()
             else:
                 self.larva.remove(lar)
-                count_lar_die_hunger += 1
+                self.count_lar_die_hunger += 1
+                continue
 
             lar.growup_larva()
 
@@ -221,79 +239,72 @@ class Hive:
                 if choice > 40:
                     self.bee.append(WorkBee(random.randint(1, 3), self.number_bee, 0, random.randint(3, 4)))
                 else:
-                    self.bee.append(UnworkBee(random.randint(1, 3), hive.get_number_bee(), random.randint(0, 60)))
+                    self.bee.append(UnworkBee(random.randint(1, 3), hive.get_number_bee(), 0))
                 self.larva.remove(lar)
 
         if not self.larva:
             print('Трутней достаточно')
         else:
-            print('Трутней недостаточно\n Количество оставшихся личинок: {}'.format(len(self.larva)))
+            print('Трутней недостаточно\nКоличество оставшихся личинок: {}'.format(len(self.larva)))
             print('Количество недостающих трутней: {}'.format(len(self.larva) // 10))
 
-        count_larva_die_age = 0  # кол-во личинок умирающих от возраста
+        self.count_larva_die_age = 0  # кол-во личинок умирающих от возраста
 
         for lar in self.larva:
             if lar.age_larva() > 9:
                 self.larva.remove(lar)
-                count_larva_die_age += 1
+                self.count_larva_die_age += 1
 
-        count_die_larva = count_larva_die_age + count_lar_die_hunger
+        print()
 
         print('Количество личинок: {}'.format(len(self.larva)))
+        print('Количество трутней: {}'.format(self.quantity_unwork_bee))
+        print('Количество рабочих пчёл: {}'.format(self.quantity_work_bee))
 
         print()
 
-        print('Количество трутней: {}'.format(quantity_unwork_bee))
-
-        print()
-
-        print('Количество рабочих пчёл: {}'.format(quantity_work_bee))
-
-        print()
-
-        print('Пчелы принесли {} грамм меда'.format(collect_honey_bee_day))
+        print('Пчелы принесли {} грамм меда'.format(self.collect_honey_bee_day))
+        print('Пчелы съели {} грамм меда'.format(self.eaten_honey_day))
 
         print(' ')
 
-        print('Пчелы съели {} грамм меда'.format(eaten_honey_day))
+        self.diff_btw_honey = 0
+        self.diff_btw_honey = self.collect_honey_bee_day - self.eaten_honey_day  # разница между принесенным медом и съеденным за день
 
-        print(' ')
-
-        diff_btw_honey = collect_honey_bee_day - eaten_honey_day  # разница между принесенным медом и съеденным за день
-
-        if diff_btw_honey > 0:
+        if self.diff_btw_honey > 0:
             print('Пчелы пополнили улей на {} грамм меда'.format(
-                diff_btw_honey
+                self.diff_btw_honey
             ))
         else:
             print('Пчелы уменьшили количество меда в улье на {} грамм'.format(
-                (-diff_btw_honey)
+                (-self.diff_btw_honey)
             ))
 
         print(' ')
 
-        quantity_bee_die = count_bees_die_hunger + count_bees_die_age  # кол-во мертвых пчёл
+        quantity_bee_die = self.count_bees_die_hunger + self.count_bees_die_age  # кол-во мертвых пчёл
 
         if quantity_bee_die > 0:
             print('Процент пчел умирающих от голода: {}%'.format(
-                (round((count_bees_die_hunger / quantity_bee_die) * 100))
+                (round((self.count_bees_die_hunger / quantity_bee_die) * 100))
             ))
         else:
             print('Процент пчел умирающих от голода: 0%')
 
-        quantity_die_larva = count_larva_die_age + count_lar_die_hunger  # кол-во мертвых личинок
+        self.quantity_die_larva = 0
+        self.quantity_die_larva = self.count_larva_die_age + self.count_lar_die_hunger  # кол-во мертвых личинок
 
-        if quantity_die_larva > 0:
+        if self.quantity_die_larva > 0:
             print('Процент личинок умирающих от голода: {}%'.format(
-                (count_lar_die_hunger / quantity_die_larva) * 100))
+                (round((self.count_lar_die_hunger / self.quantity_die_larva) * 100))))
         else:
             print('Процент личинок умирающих от голода: 0')
 
-        quantity_unwork_bee = count_unworkbee_die_age + count_unworkbee_die_age
+        quantity_unworkbee_die_bee = self.count_unworkbee_die_hunger + self.count_unworkbee_die_age  # кол-во мертвых трутней
 
-        if quantity_unwork_bee > 0:
+        if quantity_unworkbee_die_bee > 0:
             print('Процент трутней умирающих от голода: {}%'.format(
-                (count_unworkbee_die_hunger / quantity_unwork_bee) * 100))
+                (round((self.count_unworkbee_die_hunger / quantity_unworkbee_die_bee) * 100))))
         else:
             print('Процент трутней умирающих от голода: 0')
 
@@ -308,7 +319,7 @@ class Hive:
                     self.egg.remove(self.egg[0])
                     self.larva.append(Larva(self.number_larva))
 
-        print('Количество простаивающих выметающих рабочих пчел:', len(arr_activity_cleaning_bee))
+        print('Количество простаивающих выметающих рабочих пчел:', len(self.arr_activity_cleaning_bee))
 
         print(' ')
 
@@ -316,11 +327,13 @@ class Hive:
         for j in self.bee[:]:
             if j.cause_death == 0:
                 continue
-            for k in arr_activity_cleaning_bee[:]:
+            for k in self.arr_activity_cleaning_bee[:]:
                 if k.get_weight() >= j.get_weight():
                     self.bee.remove(j)
-                    arr_activity_cleaning_bee.remove(k)
+                    self.arr_activity_cleaning_bee.remove(k)
                     break
+
+        self.die_bee = 0
 
         for bee in self.bee:
             if bee.get_cause_death() != 0:
@@ -336,6 +349,9 @@ class Hive:
             if egg.day_life() == 2:
                 self.egg.remove(egg)
 
+    def __str__(self):
+        return 'asdfsfsa'
+
 
 hive = Hive(10000)
 
@@ -348,9 +364,68 @@ for workbee in range(25):
 #создание трутней
 for unwork_bee in range(12):
     hive.add_bee(UnworkBee(random.randint(1, 3), hive.get_number_bee(), random.randint(0, 60)))
-# жизнь
-for i in range(12):
-    hive.life()
+
+# # жизнь
+# for i in range(12):
+#     hive.life()
 
 # hive.life()
+
+root = Tk()
+
+root.title('Улей')
+root.geometry('450x515')
+
+# for i in range(2):
+#     root.columnconfigure(i, weight=1)
+#     root.rowconfigure(i, weight=1)
+
+
+day = Label(root, text='Жизнь пчёл', font=50)
+day.pack(anchor=CENTER, padx=150)
+
+frame = Frame(root)
+frame.pack(padx=5, pady=5, fill=BOTH)
+
+
+# text_area = Text(frame, wrap='word')
+# text_area.pack(side=LEFT, fill=BOTH, expand=True)
+
+text_area = Text(frame, wrap='word', width=55, height=25)
+text_area.pack(side=LEFT, fill=BOTH)
+
+scrollbar_y = ttk.Scrollbar(frame, orient='vertical', command=text_area.yview)
+scrollbar_y.pack(side=LEFT, fill=Y)
+
+
+# text_area.place(x=100, y=100)
+
+
+def insert_text(action):
+    if action == 'Следующий день':
+        text_area.delete(0.1, END)
+        captured_output = io.StringIO()
+        sys.stdout = captured_output
+        hive.life()
+        output = captured_output.getvalue()
+        text_area.delete(0.1, END)
+        text_area.insert(END, output)
+        captured_output.close()
+    elif action == 'Следующие 10 дней':
+        text_area.delete(0.1, END)
+        for i in range(10):
+            captured_output = io.StringIO()
+            sys.stdout = captured_output
+            hive.life()
+            output = captured_output.getvalue()
+            text_area.insert(END, output)
+            captured_output.close()
+
+
+btn_day = ttk.Button(text='Следующий день', command=lambda: insert_text('Следующий день'))
+btn_day.pack(side=LEFT, padx=5, pady=5, ipadx=25, ipady=20)
+
+btn_day_10 = ttk.Button(text='Следующие 10 дней', command=lambda: insert_text('Следующие 10 дней'))
+btn_day_10.pack(side=RIGHT, padx=5, pady=5, ipadx=20, ipady=20)
+root.mainloop()
 
